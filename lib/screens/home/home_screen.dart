@@ -1,47 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../services/auth_service.dart';
+//import '../../services/auth_service.dart';
 import '../../providers/food_provider.dart';
 import '../../widgets/food_card.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Widget child;
+  const HomeScreen({super.key, required this.child });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = [
-    const HomePage(),
-    const FoodListPage(),
-    const MapPage(),
-    const ProfilePage(),
-  ];
-
-  @override
+ @override
   Widget build(BuildContext context) {
+    final location = GoRouterState.of(context).uri.toString();
+
+    int currentIndex = 0;
+    if (location == '/home') {
+      currentIndex = 0;
+    } else if (location.startsWith('/food-list')) {
+      currentIndex = 1;
+    } else if (location.startsWith('/map')) {
+      currentIndex = 2;
+    } else if (location.startsWith('/profile')) {
+      currentIndex = 3;
+    }
     return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: _pages),
+      body: const HomePage(), // Keeps your full homepage UI
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
+        currentIndex: currentIndex,
         onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
+          switch (index) {
+            case 0:
+              context.go('/home');
+              break;
+            case 1:
+              context.go('/food-list');
+              break;
+            case 2:
+              context.go('/map');
+              break;
+            case 3:
+              context.go('/profile');
+              break;
+          }
         },
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu),
-            label: 'Food',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.restaurant_menu), label: 'Food'),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
@@ -278,47 +289,4 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class FoodListPage extends StatelessWidget {
-  const FoodListPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Food List Page - Navigate to /food-list for full view'),
-    );
-  }
-}
-
-class MapPage extends StatelessWidget {
-  const MapPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Map Page - Navigate to /map for full view'),
-    );
-  }
-}
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context, listen: false);
-
-    return Center(
-      child: ElevatedButton(
-        onPressed: () async {
-          final navigator = Navigator.of(
-            context,
-          ); // or: final router = GoRouter.of(context);
-          await authService.logout();
-          navigator.pushReplacementNamed('/login'); // or: router.go('/login');
-        },
-
-        child: const Text('Logout'),
-      ),
-    );
-  }
-}

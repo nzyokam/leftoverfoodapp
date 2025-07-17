@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../providers/food_provider.dart';
 import '../../providers/location_provider.dart';
 import '../../models/food_item_model.dart';
@@ -18,6 +20,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   final _descriptionController = TextEditingController();
   final _quantityController = TextEditingController();
   final _addressController = TextEditingController();
+    final ImagePicker _picker = ImagePicker();
   
   String _selectedCategory = 'Vegetables';
   String _selectedUnit = 'kg';
@@ -25,6 +28,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   DateTime _selectedPickupFrom = DateTime.now();
   DateTime _selectedPickupUntil = DateTime.now().add(const Duration(hours: 24));
   final List<String> _selectedAllergens = [];
+  final List<File> _selectedImages = [];
   
   final List<String> _categories = [
     'Vegetables',
@@ -72,7 +76,91 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       });
     });
   }
+  // Image picker methods
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 800,
+        maxHeight: 600,
+        imageQuality: 85,
+      );
+      
+      if (image != null) {
+        setState(() {
+          _selectedImages.add(File(image.path));
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error picking image: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
+  Future<void> _takePhoto() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 800,
+        maxHeight: 600,
+        imageQuality: 85,
+      );
+      
+      if (image != null) {
+        setState(() {
+          _selectedImages.add(File(image.path));
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error taking photo: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Choose from Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Take Photo'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _takePhoto();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
+  }
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       final foodProvider = Provider.of<FoodProvider>(context, listen: false);
@@ -88,6 +176,8 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         return;
       }
 
+      List<String> imagePaths = _selectedImages.map((file) => file.path).toList();
+
       final foodItem = FoodItemModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         donorId: 'current_user_id', // Replace with actual user ID
@@ -96,7 +186,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         category: _selectedCategory,
         quantity: int.parse(_quantityController.text),
         unit: _selectedUnit,
-        images: [], // TODO: Add image upload functionality
+        images: imagePaths, 
         expiryDate: _selectedExpiryDate,
         pickupFrom: _selectedPickupFrom,
         pickupUntil: _selectedPickupUntil,
@@ -127,6 +217,16 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
           ),
         );
       }
+    }
+  }
+
+  void _handleBackNavigation() {
+    // Check if we can pop (if there's a previous route in the stack)
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      // If there's nothing to pop, go to home screen
+      context.go('/home');
     }
   }
 
@@ -178,6 +278,140 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
     }
   }
 
+ Widget _buildImageSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Image upload container
+        GestureDetector(
+          onTap: _showImagePickerOptions,
+          child: Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: _selectedImages.isEmpty
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add_photo_alternate,
+                        size: 50,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Add Food Photo',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Tap to select image',
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  )
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(
+                      _selectedImages[0],
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 200,
+                    ),
+                  ),
+          ),
+        ),
+        
+        // Selected images horizontal list
+        if (_selectedImages.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          const Text(
+            'Selected Images:',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 80,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _selectedImages.length + 1,
+              itemBuilder: (context, index) {
+                if (index == _selectedImages.length) {
+                  // Add more button
+                  return GestureDetector(
+                    onTap: _showImagePickerOptions,
+                    child: Container(
+                      width: 80,
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.grey[600],
+                        size: 30,
+                      ),
+                    ),
+                  );
+                }
+                
+                return Container(
+                  width: 80,
+                  margin: const EdgeInsets.only(right: 8),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          _selectedImages[index],
+                          fit: BoxFit.cover,
+                          width: 80,
+                          height: 80,
+                        ),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: GestureDetector(
+                          onTap: () => _removeImage(index),
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,259 +421,239 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
         foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/food-list'),
+          onPressed: _handleBackNavigation,
         ),
       ),
       body: Consumer<FoodProvider>(
         builder: (context, foodProvider, child) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Food Image Upload Section
-                  Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add_photo_alternate,
-                          size: 50,
-                          color: Colors.grey[600],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Add Food Photo',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Food Title
-                  TextFormField(
-                    controller: _titleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Food Title',
-                      hintText: 'Enter food title',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.restaurant),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter food title';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Category Dropdown
-                  DropdownButtonFormField<String>(
-                    value: _selectedCategory,
-                    decoration: const InputDecoration(
-                      labelText: 'Category',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.category),
-                    ),
-                    items: _categories.map((category) {
-                      return DropdownMenuItem(
-                        value: category,
-                        child: Text(category),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedCategory = value!;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Quantity and Unit Row
-                  Row(
+            child: Column( // Changed from Form to Column to fix scrolling
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Expanded(
-                        flex: 2,
-                        child: TextFormField(
-                          controller: _quantityController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Quantity',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.numbers),
+                      // Food Image Upload Section
+                       _buildImageSection(),
+                      const SizedBox(height: 24),
+
+                      // Food Title
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Food Title',
+                          hintText: 'Enter food title',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.restaurant),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter food title';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Category Dropdown
+                      DropdownButtonFormField<String>(
+                        value: _selectedCategory,
+                        decoration: const InputDecoration(
+                          labelText: 'Category',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.category),
+                        ),
+                        items: _categories.map((category) {
+                          return DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCategory = value!;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Quantity and Unit Row
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: TextFormField(
+                              controller: _quantityController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                labelText: 'Quantity',
+                                border: OutlineInputBorder(),
+                                prefixIcon: Icon(Icons.numbers),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Enter quantity';
+                                }
+                                if (int.tryParse(value) == null) {
+                                  return 'Invalid number';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Enter quantity';
-                            }
-                            if (int.tryParse(value) == null) {
-                              return 'Invalid number';
-                            }
-                            return null;
-                          },
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: _selectedUnit,
+                              decoration: const InputDecoration(
+                                labelText: 'Unit',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: _units.map((unit) {
+                                return DropdownMenuItem(
+                                  value: unit,
+                                  child: Text(unit),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedUnit = value!;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Description
+                      TextFormField(
+                        controller: _descriptionController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          labelText: 'Description',
+                          hintText: 'Enter food description',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.description),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter description';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Expiry Date
+                      ListTile(
+                        title: const Text('Expiry Date'),
+                        subtitle: Text(_selectedExpiryDate.toString().split('.')[0]),
+                        leading: const Icon(Icons.calendar_today),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () => _selectDate(context, 'expiry'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: Colors.grey[300]!),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: _selectedUnit,
-                          decoration: const InputDecoration(
-                            labelText: 'Unit',
-                            border: OutlineInputBorder(),
-                          ),
-                          items: _units.map((unit) {
-                            return DropdownMenuItem(
-                              value: unit,
-                              child: Text(unit),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedUnit = value!;
-                            });
-                          },
+                      const SizedBox(height: 16),
+
+                      // Pickup Time Range
+                      ListTile(
+                        title: const Text('Pickup From'),
+                        subtitle: Text(_selectedPickupFrom.toString().split('.')[0]),
+                        leading: const Icon(Icons.access_time),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () => _selectDate(context, 'pickup_from'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: Colors.grey[300]!),
                         ),
+                      ),
+                      const SizedBox(height: 8),
+                      ListTile(
+                        title: const Text('Pickup Until'),
+                        subtitle: Text(_selectedPickupUntil.toString().split('.')[0]),
+                        leading: const Icon(Icons.access_time_filled),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () => _selectDate(context, 'pickup_until'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: Colors.grey[300]!),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Address
+                      TextFormField(
+                        controller: _addressController,
+                        decoration: const InputDecoration(
+                          labelText: 'Pickup Address',
+                          hintText: 'Enter pickup address',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.location_on),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter pickup address';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Allergens
+                      const Text(
+                        'Allergens (if any):',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        children: _allergenOptions.map((allergen) {
+                          return FilterChip(
+                            label: Text(allergen),
+                            selected: _selectedAllergens.contains(allergen),
+                            onSelected: (selected) {
+                              setState(() {
+                                if (selected) {
+                                  _selectedAllergens.add(allergen);
+                                } else {
+                                  _selectedAllergens.remove(allergen);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Submit Button
+                      ElevatedButton(
+                        onPressed: foodProvider.isLoading ? null : _submitForm,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: foodProvider.isLoading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text(
+                                'Add Food Item',
+                                style: TextStyle(fontSize: 18),
+                              ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-
-                  // Description
-                  TextFormField(
-                    controller: _descriptionController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: 'Description',
-                      hintText: 'Enter food description',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.description),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter description';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Expiry Date
-                  ListTile(
-                    title: const Text('Expiry Date'),
-                    subtitle: Text(_selectedExpiryDate.toString().split('.')[0]),
-                    leading: const Icon(Icons.calendar_today),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () => _selectDate(context, 'expiry'),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: Colors.grey[300]!),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Pickup Time Range
-                  ListTile(
-                    title: const Text('Pickup From'),
-                    subtitle: Text(_selectedPickupFrom.toString().split('.')[0]),
-                    leading: const Icon(Icons.access_time),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () => _selectDate(context, 'pickup_from'),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: Colors.grey[300]!),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  ListTile(
-                    title: const Text('Pickup Until'),
-                    subtitle: Text(_selectedPickupUntil.toString().split('.')[0]),
-                    leading: const Icon(Icons.access_time_filled),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () => _selectDate(context, 'pickup_until'),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: Colors.grey[300]!),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Address
-                  TextFormField(
-                    controller: _addressController,
-                    decoration: const InputDecoration(
-                      labelText: 'Pickup Address',
-                      hintText: 'Enter pickup address',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.location_on),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter pickup address';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Allergens
-                  const Text(
-                    'Allergens (if any):',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: _allergenOptions.map((allergen) {
-                      return FilterChip(
-                        label: Text(allergen),
-                        selected: _selectedAllergens.contains(allergen),
-                        onSelected: (selected) {
-                          setState(() {
-                            if (selected) {
-                              _selectedAllergens.add(allergen);
-                            } else {
-                              _selectedAllergens.remove(allergen);
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Submit Button
-                  ElevatedButton(
-                    onPressed: foodProvider.isLoading ? null : _submitForm,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: foodProvider.isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Add Food Item',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },

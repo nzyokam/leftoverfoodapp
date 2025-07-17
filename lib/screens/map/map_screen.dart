@@ -92,6 +92,10 @@ class _MapScreenState extends State<MapScreen> {
             onPressed: _showFilterDialog,
           ),
         ],
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => context.go('/home'), // or Navigator.of(context).pop()
+  ),
       ),
       body: Consumer2<FoodProvider, LocationProvider>(
         builder: (context, foodProvider, locationProvider, child) {

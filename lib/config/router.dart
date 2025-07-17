@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-//import 'package:flutter/material.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/home/home_screen.dart';
@@ -21,14 +20,31 @@ class AppRouter {
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
+
+      /// ShellRoute holds all pages with BottomNav
+      ShellRoute(
+        builder: (context, state, child) => HomeScreen(child: child), 
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const HomePage(),
+          ),
+          GoRoute(
+            path: '/food-list',
+            builder: (context, state) => const FoodListScreen(),
+          ),
+          GoRoute(
+            path: '/map',
+            builder: (context, state) => const MapScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+        ],
       ),
-      GoRoute(
-        path: '/food-list',
-        builder: (context, state) => const FoodListScreen(),
-      ),
+
+      // Other pages without bottom nav
       GoRoute(
         path: '/food-detail/:id',
         builder: (context, state) => FoodDetailScreen(
@@ -38,14 +54,6 @@ class AppRouter {
       GoRoute(
         path: '/add-food',
         builder: (context, state) => const AddFoodScreen(),
-      ),
-      GoRoute(
-        path: '/map',
-        builder: (context, state) => const MapScreen(),
-      ),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );

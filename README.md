@@ -128,11 +128,11 @@ To fight hunger by creating a bridge between surplus food and those who need it 
 ## 🛠️ Technical Stack (Planned)
 
 - **Frontend**: Flutter (Dart)
-- **Backend**: Firebase 
+- **Backend**: Supabase 
 - **Database**: Firestore
 - **Maps**: Google Maps API
-- **Authentication**: Firebase Auth
-- **Storage**: Firebase Storage
+- **Authentication**: Supabase Auth
+- **Storage**: Supabase Storage
 - **Notifications**: Firebase Cloud Messaging
 - **SMS**: Twilio API
 
@@ -162,7 +162,7 @@ To fight hunger by creating a bridge between surplus food and those who need it 
 ## 📋 Prerequisites for Development
 
 - Flutter SDK setup
-- Firebase project configuration
+- Supabase project configuration
 - Google Maps API key
 - Twilio account for SMS (optional)
 - Design assets and UI mockups

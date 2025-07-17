@@ -5,12 +5,13 @@ import '../../providers/food_provider.dart';
 import '../../widgets/food_card.dart';
 
 class FoodListScreen extends StatefulWidget {
-  const FoodListScreen({Key? key}) : super(key: key);
+  const FoodListScreen({super.key});
 
   @override
   State<FoodListScreen> createState() => _FoodListScreenState();
 }
 
+ 
 class _FoodListScreenState extends State<FoodListScreen> {
   final _searchController = TextEditingController();
   String _selectedCategory = 'All';
@@ -102,7 +103,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                         _selectedCategory = category;
                       });
                     },
-                    selectedColor: Colors.green.withOpacity(0.3),
+                    selectedColor: Colors.green.withAlpha(75),
                     labelStyle: TextStyle(
                       color: isSelected ? Colors.green : Colors.grey[600],
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

@@ -11,9 +11,10 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
+
   // Mock user data - replace with actual user provider
   final UserModel _currentUser = UserModel(
     id: 'user123',
@@ -53,6 +54,11 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             onPressed: _showSettingsDialog,
           ),
         ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () =>
+              context.go('/home'), // or Navigator.of(context).pop()
+        ),
       ),
       body: Column(
         children: [
@@ -63,10 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.green.shade400,
-                  Colors.green.shade600,
-                ],
+                colors: [Colors.green.shade400, Colors.green.shade600],
               ),
             ),
             child: Column(
@@ -111,17 +114,16 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     ),
                     if (_currentUser.isVerified) ...[
                       const SizedBox(width: 8),
-                      const Icon(
-                        Icons.verified,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                      const Icon(Icons.verified, color: Colors.white, size: 20),
                     ],
                   ],
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(16),
@@ -138,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               ],
             ),
           ),
-          
+
           // Stats Row
           Container(
             padding: const EdgeInsets.all(20),
@@ -147,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 final userFoodItems = foodProvider.foodItems
                     .where((item) => item.donorId == _currentUser.id)
                     .toList();
-                    
+
                 final donatedCount = userFoodItems.length;
                 final claimedCount = userFoodItems
                     .where((item) => item.status == 'claimed')
@@ -155,19 +157,31 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 final totalSaved = userFoodItems
                     .where((item) => item.status == 'claimed')
                     .fold(0, (sum, item) => sum + item.quantity);
-                
+
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildStatCard('Donated', donatedCount.toString(), Icons.volunteer_activism),
-                    _buildStatCard('Claimed', claimedCount.toString(), Icons.done_all),
-                    _buildStatCard('Items Saved', totalSaved.toString(), Icons.eco),
+                    _buildStatCard(
+                      'Donated',
+                      donatedCount.toString(),
+                      Icons.volunteer_activism,
+                    ),
+                    _buildStatCard(
+                      'Claimed',
+                      claimedCount.toString(),
+                      Icons.done_all,
+                    ),
+                    _buildStatCard(
+                      'Items Saved',
+                      totalSaved.toString(),
+                      Icons.eco,
+                    ),
                   ],
                 );
               },
             ),
           ),
-          
+
           // Tabs
           TabBar(
             controller: _tabController,
@@ -180,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               Tab(text: 'Activity'),
             ],
           ),
-          
+
           // Tab Content
           Expanded(
             child: TabBarView(
@@ -228,10 +242,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             const SizedBox(height: 4),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -245,7 +256,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         final userFoodItems = foodProvider.foodItems
             .where((item) => item.donorId == _currentUser.id)
             .toList();
-            
+
         if (userFoodItems.isEmpty) {
           return Center(
             child: Column(
@@ -259,18 +270,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 const SizedBox(height: 16),
                 Text(
                   'No items donated yet',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Start sharing food to help reduce waste!',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[500],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
@@ -285,7 +290,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             ),
           );
         }
-        
+
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: userFoodItems.length,
@@ -296,10 +301,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundColor: _getStatusColor(item.status),
-                  child: Icon(
-                    _getStatusIcon(item.status),
-                    color: Colors.white,
-                  ),
+                  child: Icon(_getStatusIcon(item.status), color: Colors.white),
                 ),
                 title: Text(
                   item.title,
@@ -312,15 +314,15 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     const SizedBox(height: 4),
                     Text(
                       'Created: ${_formatDate(item.createdAt)}',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                   ],
                 ),
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: _getStatusColor(item.status).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -349,7 +351,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         final claimedItems = foodProvider.foodItems
             .where((item) => item.claimedBy == _currentUser.id)
             .toList();
-            
+
         if (claimedItems.isEmpty) {
           return Center(
             child: Column(
@@ -363,18 +365,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 const SizedBox(height: 16),
                 Text(
                   'No items claimed yet',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Browse available food items to claim',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[500],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
@@ -389,7 +385,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             ),
           );
         }
-        
+
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: claimedItems.length,
@@ -413,10 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     const SizedBox(height: 4),
                     Text(
                       'Claimed: ${_formatDate(item.claimedAt!)}',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                   ],
                 ),
@@ -434,15 +427,17 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     return Consumer<FoodProvider>(
       builder: (context, foodProvider, child) {
         final userActivities = <Map<String, dynamic>>[];
-        
+
         // Add donated items
-        for (final item in foodProvider.foodItems.where((item) => item.donorId == _currentUser.id)) {
+        for (final item in foodProvider.foodItems.where(
+          (item) => item.donorId == _currentUser.id,
+        )) {
           userActivities.add({
             'type': 'donated',
             'item': item,
             'date': item.createdAt,
           });
-          
+
           if (item.claimedAt != null) {
             userActivities.add({
               'type': 'item_claimed',
@@ -451,50 +446,42 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             });
           }
         }
-        
+
         // Add claimed items
-        for (final item in foodProvider.foodItems.where((item) => item.claimedBy == _currentUser.id)) {
+        for (final item in foodProvider.foodItems.where(
+          (item) => item.claimedBy == _currentUser.id,
+        )) {
           userActivities.add({
             'type': 'claimed',
             'item': item,
             'date': item.claimedAt,
           });
         }
-        
+
         // Sort by date
         userActivities.sort((a, b) => b['date'].compareTo(a['date']));
-        
+
         if (userActivities.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.timeline,
-                  size: 64,
-                  color: Colors.grey[400],
-                ),
+                Icon(Icons.timeline, size: 64, color: Colors.grey[400]),
                 const SizedBox(height: 16),
                 Text(
                   'No activity yet',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Your food sharing activities will appear here',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[500],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                 ),
               ],
             ),
           );
         }
-        
+
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: userActivities.length,
@@ -503,16 +490,13 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             final item = activity['item'];
             final type = activity['type'];
             final date = activity['date'];
-            
+
             return Card(
               margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundColor: _getActivityColor(type),
-                  child: Icon(
-                    _getActivityIcon(type),
-                    color: Colors.white,
-                  ),
+                  child: Icon(_getActivityIcon(type), color: Colors.white),
                 ),
                 title: Text(
                   _getActivityTitle(type),
@@ -525,10 +509,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     const SizedBox(height: 4),
                     Text(
                       _formatDate(date),
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                   ],
                 ),
@@ -577,7 +558,10 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               ),
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
-                title: const Text('Logout', style: TextStyle(color: Colors.red)),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(color: Colors.red),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   _showLogoutDialog();
@@ -688,7 +672,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 7) {
       return '${date.day}/${date.month}/${date.year}';
     } else if (difference.inDays > 0) {
