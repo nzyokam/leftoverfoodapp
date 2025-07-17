@@ -4,9 +4,9 @@ A Flutter-powered mobile application designed to combat hunger and food waste by
 
 ## 📱 Project Overview
 
-**Status**: Planning Phase (Construction Not Started)  
+**Status**: Planning Phase (Construction Has Begun)  
 **Type**: Individual Project  
-**Platform**: Flutter (Cross-platform - iOS & Android)  
+**Platform**: Flutter (primarily developed for iOS)  
 **Purpose**: Social Impact Application
 
 ## 🎯 Mission Statement
@@ -105,32 +105,30 @@ To fight hunger by creating a bridge between surplus food and those who need it 
 
 ## 🚀 Development Roadmap
 
-### Phase 1: Core MVP
+### Phase 1: MVP
 - [ ] User registration and authentication
-- [ ] Basic food listing and claiming
 - [ ] Simple map integration
-- [ ] Push notifications
-- [ ] Basic impact tracking
+- [ ] MINIMAL APP OUTOOK
 
 ### Phase 2: Enhanced Features
-- [ ] Advanced filtering and search
-- [ ] Volunteer delivery system
-- [ ] SMS integration
-- [ ] Gamification elements
-- [ ] Admin dashboard
+- [ ] Basic food listing and claiming
+- [ ] Basic impact tracking
 
 ### Phase 3: Advanced Capabilities
-- [ ] AI-powered donation recommendations
 - [ ] Cold chain tracking
 - [ ] Tax receipt generation
 - [ ] Multi-city expansion tools
+- [ ] Advanced filtering and search
+- [ ] Volunteer delivery system
+- [ ] SMS integration
+- [ ] Admin dashboard
 
 ## 🛠️ Technical Stack (Planned)
 
 - **Frontend**: Flutter (Dart)
-- **Backend**: Supabase 
-- **Database**: Firestore
-- **Maps**: Google Maps API
+- **Backend**: Node.js Firebase Admin SDK for server-side Firebase services
+- **Database**: Subapase
+- **Maps**: (TBD) API
 - **Authentication**: Supabase Auth
 - **Storage**: Supabase Storage
 - **Notifications**: Firebase Cloud Messaging
@@ -138,7 +136,7 @@ To fight hunger by creating a bridge between surplus food and those who need it 
 
 ## 🌐 Localization Strategy
 
-- Primary languages: English, Swahili, Spanish
+- Primary languages: English, Swahili, Spanish(for some foregin element)
 - Culturally appropriate UI/UX design
 - Local food categorization
 - Regional community partnerships
@@ -175,7 +173,7 @@ This project is in the conceptual and planning phase. The README serves as a com
 ## 📞 Contact & Collaboration
 
 This is an individual project aimed at creating meaningful social impact through technology. The app concept focuses on practical solutions for real-world hunger and food waste challenges. 
-CONTACT: nzyokamuusi@gmail.com
+CONTACT: muusi@nzyoka.com
 
 ---
 
