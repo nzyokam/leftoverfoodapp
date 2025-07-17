@@ -1,0 +1,29 @@
+{
+  "app_title": "Shiriki Chakula Kilichobaki",
+  "login": "Ingia",
+  "register": "Jisajili",
+  "home": "Nyumbani",
+  "food_card": {
+    "expiry_date": "Tarehe ya Kumalizika",
+    "distance": "Umbali",
+    "claimed": "Imedaiwa",
+    "available": "Inapatikana"
+  },
+  "food_detail": {
+    "claim_food": "Dai Chakula",
+    "claimed_successfully": "Chakula kimedaiwa kwa mafanikio!",
+    "claim_error": "Hitilafu katika kudai chakula. Tafadhali jaribu tena."
+  },
+  "map_screen": {
+    "loading_location": "Inapakia eneo lako...",
+    "no_food_items": "Hakuna vitu vya chakula vinavyopatikana karibu."
+  },
+  "profile_screen": {
+    "my_profile": "Wasifu Wangu",
+    "logout": "Toka"
+  },
+  "add_food_screen": {
+    "add_food_item": "Ongeza Kitu cha Chakula",
+    "submit": "Wasilisha"
+  }
+}

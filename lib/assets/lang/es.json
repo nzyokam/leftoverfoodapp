@@ -1,0 +1,29 @@
+{
+  "app_title": "Compartir Comida Sobrante",
+  "login": "Iniciar sesión",
+  "register": "Registrarse",
+  "home": "Inicio",
+  "food_card": {
+    "expiry_date": "Fecha de vencimiento",
+    "distance": "Distancia",
+    "claimed": "Reclamado",
+    "available": "Disponible"
+  },
+  "food_detail": {
+    "claim_food": "Reclamar comida",
+    "claimed_successfully": "¡Comida reclamada con éxito!",
+    "claim_error": "Error al reclamar la comida. Por favor, inténtalo de nuevo."
+  },
+  "map_screen": {
+    "loading_location": "Cargando tu ubicación...",
+    "no_food_items": "No hay alimentos disponibles cerca."
+  },
+  "profile_screen": {
+    "my_profile": "Mi perfil",
+    "logout": "Cerrar sesión"
+  },
+  "add_food_screen": {
+    "add_food_item": "Agregar alimento",
+    "submit": "Enviar"
+  }
+}

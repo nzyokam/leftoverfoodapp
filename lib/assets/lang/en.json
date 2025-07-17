@@ -1,0 +1,29 @@
+{
+  "app_title": "Leftover Food Share",
+  "login": "Login",
+  "register": "Register",
+  "home": "Home",
+  "food_card": {
+    "expiry_date": "Expiry Date",
+    "distance": "Distance",
+    "claimed": "Claimed",
+    "available": "Available"
+  },
+  "food_detail": {
+    "claim_food": "Claim Food",
+    "claimed_successfully": "Food claimed successfully!",
+    "claim_error": "Error claiming food. Please try again."
+  },
+  "map_screen": {
+    "loading_location": "Loading your location...",
+    "no_food_items": "No food items available nearby."
+  },
+  "profile_screen": {
+    "my_profile": "My Profile",
+    "logout": "Logout"
+  },
+  "add_food_screen": {
+    "add_food_item": "Add Food Item",
+    "submit": "Submit"
+  }
+}
