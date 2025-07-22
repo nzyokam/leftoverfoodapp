@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "383740409419",
+    "project_id": "foodsharing-5777b",
+    "storage_bucket": "foodsharing-5777b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:383740409419:android:673f9fa698a68023f33fce",
+        "android_client_info": {
+          "package_name": "com.nzyoka.foodsharing"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5jsQlwU5j7lPkf5H_ULeeya1Sp4XoGm4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
